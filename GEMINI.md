@@ -7,7 +7,10 @@
 @docs/rules/AGENTS_CORE.md
 @docs/rules/AGENTS_BRIDGE.md
 
-## Project Overview
+## Security Specifications
+
+@docs/rules/31_Secure_Watcher.md
+@docs/rules/34_Diamond_Rules.md
 
 Bridge Watcher is the infrastructure layer of the Antigravity Bridge Protocol. It:
 - Watches `.ai-handoff/tasks/` for new tasks
