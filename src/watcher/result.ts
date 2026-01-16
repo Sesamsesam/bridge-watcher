@@ -2,10 +2,31 @@
  * Result schema and writing
  * 
  * Defines the structure of result JSON files after task execution.
+ * Updated for protocol compliance with exit_path and task_snapshot.
  */
 
 import { fsSafe } from '../safe/index.js';
+// TODO: Use Task type for task_snapshot in results (V1 enhancement)
+// import { Task } from './task.js';
 import * as path from 'node:path';
+
+/**
+ * Exit paths - canonical reasons for task completion
+ */
+export type ExitPath =
+    | 'completed_success'
+    | 'completed_failed'
+    | 'worker_locked'
+    | 'schema_invalid'
+    | 'idempotent_skip'
+    | 'branch_checkout_failed'
+    | 'repo_dirty'
+    | 'opencode_timeout'
+    | 'opencode_crashed'
+    | 'verify_failed'
+    | 'scope_violation'
+    | 'secret_detected'
+    | 'internal_error';
 
 export type ResultStatus = 'success' | 'failed' | 'error' | 'secret_detected';
 
