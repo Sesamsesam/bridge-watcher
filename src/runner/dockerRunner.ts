@@ -158,17 +158,12 @@ export async function isDockerAvailable(): Promise<boolean> {
  * Check if the bridge-runner image exists
  */
 export async function isRunnerImageAvailable(image: string = DOCKER_IMAGE): Promise<boolean> {
-    return new Promise((resolve) => {
-        const proc = spawn('docker', ['image', 'inspect', image], {
-            stdio: 'ignore'
-        });
-
-        proc.on('close', (code) => {
-            resolve(code === 0);
-        });
-
-        proc.on('error', () => {
-            resolve(false);
-        });
-    });
+    try {
+        // Use execSync for more reliable synchronous check
+        const { execSync } = await import('node:child_process');
+        execSync(`docker image inspect ${image}`, { stdio: 'ignore' });
+        return true;
+    } catch {
+        return false;
+    }
 }
