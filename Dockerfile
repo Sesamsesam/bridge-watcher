@@ -10,18 +10,15 @@ RUN apk add --no-cache \
     bash \
     coreutils
 
-# Create non-root user
-RUN adduser -D -u 1000 runner
-
-# Install OpenCode CLI (if available)
-# Note: This may need adjustment based on OpenCode installation method
-# RUN npm install -g opencode
+# The oven/bun image already has a 'bun' user (UID 1000)
+# We'll use that instead of creating a new user
 
 # Set working directory
 WORKDIR /workspace
 
-# Switch to non-root user
-USER runner
+# Switch to non-root user (bun user from base image)
+USER bun
 
 # Default command (will be overridden by runner)
 CMD ["echo", "bridge-runner ready"]
+
