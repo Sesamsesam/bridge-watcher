@@ -11,7 +11,6 @@
  */
 
 import * as path from 'node:path';
-import * as fs from 'node:fs/promises';
 import { fsSafe, gitSafe, StreamScanner } from '../safe/index.js';
 import { DockerRunner, isDockerAvailable, isRunnerImageAvailable } from '../runner/index.js';
 import { Task, loadTasks } from './task.js';

@@ -60,7 +60,6 @@ export class StreamScanner {
     private overlapBuffer: string = '';
     private patterns: Array<{ name: string; regex: RegExp }>;
     private totalLines: number = 0;
-    private lastCharWasNewline: boolean = true;
 
     constructor(additionalPatterns: Array<{ name: string; pattern: string }> = []) {
         // Clone core patterns (need fresh regex objects for stateful matching)
@@ -75,15 +74,6 @@ export class StreamScanner {
                 name: p.name,
                 regex: new RegExp(p.pattern, 'g')
             });
-        }
-    }
-
-    /**
-     * Reset pattern regex lastIndex for fresh matching
-     */
-    private resetPatterns(): void {
-        for (const p of this.patterns) {
-            p.regex.lastIndex = 0;
         }
     }
 

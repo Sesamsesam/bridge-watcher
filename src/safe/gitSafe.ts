@@ -8,9 +8,8 @@
  * - Uses simple-git for structured, safe parsing
  */
 
-import simpleGit, { SimpleGit, SimpleGitOptions, StatusResult } from 'simple-git';
+import { simpleGit, SimpleGit, SimpleGitOptions, StatusResult } from 'simple-git';
 import * as path from 'node:path';
-import { fsSafe, PathEscapeError } from './fsSafe.js';
 
 const DEFAULT_TIMEOUT_MS = 30_000; // 30 seconds
 const MAX_DIFF_SIZE = 10 * 1024 * 1024; // 10 MB
