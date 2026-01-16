@@ -3,10 +3,11 @@
  * 
  * Handles:
  * - Worker lock acquisition
+ * - Safety checks (dirty repo, scope enforcement)
  * - Task claiming and processing
  * - Worktree creation and cleanup
  * - Docker execution
- * - Output scanning
+ * - Output scanning with log capping
  * - Result writing
  */
 
@@ -25,6 +26,9 @@ import {
     SecretIncident
 } from './result.js';
 import { createHash } from 'node:crypto';
+import { isRepoDirty, validateScope, getChangedFiles, findSecretFiles } from './safety.js';
+// TODO: Integrate capOutput for log capping in command output handling
+// import { capOutput } from './logcap.js';
 
 const HANDOFF_DIR = '.ai-handoff';
 const DIRS = {
@@ -232,6 +236,39 @@ export class WatcherLoop {
                 });
             }
 
+            // V1: Check for scope violations
+            const changedFiles = await getChangedFiles(worktreePath);
+            const scopeValidation = validateScope(task.scope, changedFiles);
+            if (!scopeValidation.passed) {
+                await this.cleanupWorktree(worktreePath);
+                await fsSafe.unlink(
+                    path.join(this.handoffPath, DIRS.running, `${task.id}.json`),
+                    this.config.repoPath
+                );
+                return createFailedResult(
+                    task.id,
+                    startedAt,
+                    `Scope violation: files outside scope were modified: ${scopeValidation.violations.join(', ')}`,
+                    verifyResults
+                );
+            }
+
+            // V1: Check for secretless contract violations
+            const secretFiles = findSecretFiles(changedFiles);
+            if (secretFiles.length > 0) {
+                await this.cleanupWorktree(worktreePath);
+                await fsSafe.unlink(
+                    path.join(this.handoffPath, DIRS.running, `${task.id}.json`),
+                    this.config.repoPath
+                );
+                return createFailedResult(
+                    task.id,
+                    startedAt,
+                    `Secretless contract violation: forbidden files created: ${secretFiles.join(', ')}`,
+                    verifyResults
+                );
+            }
+
             // Cleanup worktree
             await this.cleanupWorktree(worktreePath);
 
@@ -311,6 +348,12 @@ export class WatcherLoop {
         const imageOk = await isRunnerImageAvailable();
         if (!imageOk) {
             throw new Error('bridge-runner:dev image not found. Run: docker build -t bridge-runner:dev .');
+        }
+
+        // V1: Check if repo is dirty
+        const dirty = await isRepoDirty(this.config.repoPath);
+        if (dirty) {
+            throw new Error('Repository has uncommitted changes. Commit or stash before running watcher.');
         }
 
         // Acquire worker lock
