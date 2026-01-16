@@ -48,3 +48,10 @@ bun run typecheck
 - `src/watcher/` - Main watcher loop
 - `src/harness/` - Adversarial security tests
 - `src/cli.ts` - CLI entrypoint
+
+## Documentation
+
+- **Getting Started**: `docs/guides/00_GETTING_STARTED.md`
+- **Daily Workflow**: `docs/guides/01_DAILY_WORKFLOW.md`
+- **Architecture**: `docs/architecture/ARCHITECTURE.md`
+- **Full Blueprint**: `docs/architecture/BLUEPRINT.md`
