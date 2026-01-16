@@ -1,0 +1,3 @@
+[submodule "docs/rules"]
+	path = docs/rules
+	url = https://github.com/Sesamsesam/antigravity-rules.git
